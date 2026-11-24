@@ -1,0 +1,1309 @@
+<!DOCTYPE html>
+<html lang="es" class="h-full bg-slate-900 text-slate-100">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Presidentes de Argentina (1854-2023) - App de Estudio</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- FontAwesome for Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
+    <style>
+        body {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+        }
+
+        /* Custom scrollbar */
+        ::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #0f172a;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #334155;
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #475569;
+        }
+
+        /* Custom glow effects */
+        .glow-celeste {
+            box-shadow: 0 0 25px -5px rgba(56, 189, 248, 0.3);
+        }
+        .glow-gold {
+            box-shadow: 0 0 25px -5px rgba(245, 158, 11, 0.3);
+        }
+
+        /* Card flip / image transition */
+        .portrait-container {
+            perspective: 1000px;
+        }
+
+        .shake {
+            animation: shake 0.4s cubic-bezier(.36,.07,.19,.97) both;
+        }
+
+        @keyframes shake {
+            10%, 90% { transform: translate3d(-1px, 0, 0); }
+            20%, 80% { transform: translate3d(2px, 0, 0); }
+            30%, 50%, 70% { transform: translate3d(-4px, 0, 0); }
+            40%, 60% { transform: translate3d(4px, 0, 0); }
+        }
+
+        .pop-in {
+            animation: popIn 0.3s ease-out forwards;
+        }
+
+        @keyframes popIn {
+            0% { opacity: 0; transform: scale(0.95); }
+            100% { opacity: 1; transform: scale(1); }
+        }
+    </style>
+</head>
+<body class="min-h-screen flex flex-col justify-between bg-slate-950 text-slate-100 selection:bg-sky-500 selection:text-white">
+
+    <!-- HEADER / NAVIGATION -->
+    <header class="border-b border-slate-800 bg-slate-900/80 backdrop-blur-md sticky top-0 z-40">
+        <div class="max-w-6xl mx-auto px-4 py-3 flex flex-wrap items-center justify-between gap-3">
+            <!-- Brand -->
+            <div class="flex items-center gap-3">
+                <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-sky-500 via-sky-300 to-amber-300 flex items-center justify-center shadow-md shadow-sky-500/20">
+                    <i class="fa-solid font-bold text-slate-950 text-xl font-serif">🇦🇷</i>
+                </div>
+                <div>
+                    <h1 class="text-lg font-bold text-white leading-tight flex items-center gap-2">
+                        Presidentes de Argentina
+                        <span class="text-xs font-semibold px-2 py-0.5 rounded-full bg-sky-500/10 text-sky-400 border border-sky-500/30">1854 - 2023</span>
+                    </h1>
+                    <p class="text-xs text-slate-400">Plataforma interactiva de estudio e historia nacional</p>
+                </div>
+            </div>
+
+            <!-- View Switcher Tabs -->
+            <div class="flex items-center gap-1 bg-slate-950 p-1 rounded-xl border border-slate-800 text-sm">
+                <button id="nav-quiz-btn" onclick="switchView('quiz')" class="px-4 py-1.5 rounded-lg font-medium transition flex items-center gap-2 bg-sky-600 text-white shadow-sm">
+                    <i class="fa-solid fa-graduation-cap"></i> Modos de Juego
+                </button>
+                <button id="nav-guide-btn" onclick="switchView('guide')" class="px-4 py-1.5 rounded-lg font-medium transition flex items-center gap-2 text-slate-400 hover:text-white hover:bg-slate-900">
+                    <i class="fa-solid fa-book-open"></i> Guía Completa (48)
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <!-- MAIN APP CONTAINER -->
+    <main class="max-w-6xl mx-auto px-4 py-6 flex-1 w-full">
+
+        <!-- ================= VIEW 1: QUIZ / FLASHCARD MODE ================= -->
+        <div id="view-quiz" class="space-y-6">
+
+            <!-- CONTROL & FILTERS BAR -->
+            <div class="bg-slate-900/90 border border-slate-800 rounded-2xl p-4 shadow-lg backdrop-blur flex flex-wrap items-center justify-between gap-4">
+                
+                <!-- Filter Select -->
+                <div class="flex flex-wrap items-center gap-3">
+                    <div class="flex items-center gap-2">
+                        <i class="fa-solid fa-filter text-sky-400 text-sm"></i>
+                        <label for="filter-era" class="text-xs font-semibold text-slate-300 uppercase tracking-wider">Período:</label>
+                    </div>
+                    <select id="filter-era" onchange="applyFilters()" class="bg-slate-950 border border-slate-700 text-slate-200 text-sm rounded-xl px-3 py-2 focus:ring-2 focus:ring-sky-500 focus:outline-none">
+                        <option value="ALL">Todos los Períodos (48 Mandatos)</option>
+                        <option value="ORG_PAN">1854 - 1916: Org. Nacional y PAN</option>
+                        <option value="UCR_INFAME">1916 - 1946: UCR y Década Infame</option>
+                        <option value="PERON_GOLPES">1946 - 1983: Peronismo y Dictaduras</option>
+                        <option value="DEMOCRACIA">1983 - 2023: Democracia Restaurada</option>
+                    </select>
+                </div>
+
+                <!-- Order Toggle -->
+                <div class="flex items-center gap-2 bg-slate-950 p-1 rounded-xl border border-slate-800 text-xs">
+                    <button id="order-rand-btn" onclick="setOrder('RANDOM')" class="px-3 py-1.5 rounded-lg font-semibold bg-sky-600 text-white transition">
+                        <i class="fa-solid fa-shuffle mr-1"></i> Aleatorio
+                    </button>
+                    <button id="order-crono-btn" onclick="setOrder('CRONO')" class="px-3 py-1.5 rounded-lg font-semibold text-slate-400 hover:text-white transition">
+                        <i class="fa-solid fa-arrow-down-1-9 mr-1"></i> Cronológico
+                    </button>
+                </div>
+
+                <!-- Toggle Options -->
+                <div class="flex items-center gap-4 text-xs font-medium text-slate-300">
+                    <label class="flex items-center gap-2 cursor-pointer select-none">
+                        <input type="checkbox" id="toggle-party-badge" onchange="renderCard()" checked class="w-4 h-4 rounded text-sky-500 focus:ring-sky-500 bg-slate-950 border-slate-700">
+                        <span>Mostrar Etapa/Partido</span>
+                    </label>
+
+                    <label class="flex items-center gap-2 cursor-pointer select-none">
+                        <input type="checkbox" id="toggle-sound" checked class="w-4 h-4 rounded text-sky-500 focus:ring-sky-500 bg-slate-950 border-slate-700">
+                        <span><i class="fa-solid fa-volume-high text-slate-400"></i> Sonido</span>
+                    </label>
+                </div>
+
+            </div>
+
+            <!-- STATS & PROGRESS HEADER -->
+            <div class="grid grid-cols-2 md:grid-cols-4 gap-3">
+                <div class="bg-slate-900 border border-slate-800 rounded-xl p-3 flex items-center gap-3">
+                    <div class="w-10 h-10 rounded-lg bg-sky-500/10 border border-sky-500/20 text-sky-400 flex items-center justify-center font-bold text-lg">
+                        <i class="fa-solid fa-bullseye"></i>
+                    </div>
+                    <div>
+                        <div class="text-xs text-slate-400 font-medium">Aciertos</div>
+                        <div id="stat-correct" class="text-lg font-bold text-emerald-400">0</div>
+                    </div>
+                </div>
+
+                <div class="bg-slate-900 border border-slate-800 rounded-xl p-3 flex items-center gap-3">
+                    <div class="w-10 h-10 rounded-lg bg-rose-500/10 border border-rose-500/20 text-rose-400 flex items-center justify-center font-bold text-lg">
+                        <i class="fa-solid fa-xmark"></i>
+                    </div>
+                    <div>
+                        <div class="text-xs text-slate-400 font-medium">Errores</div>
+                        <div id="stat-incorrect" class="text-lg font-bold text-rose-400">0</div>
+                    </div>
+                </div>
+
+                <div class="bg-slate-900 border border-slate-800 rounded-xl p-3 flex items-center gap-3">
+                    <div class="w-10 h-10 rounded-lg bg-amber-500/10 border border-amber-500/20 text-amber-400 flex items-center justify-center font-bold text-lg">
+                        <i class="fa-solid fa-fire"></i>
+                    </div>
+                    <div>
+                        <div class="text-xs text-slate-400 font-medium">Racha Actual</div>
+                        <div id="stat-streak" class="text-lg font-bold text-amber-400">0 🔥</div>
+                    </div>
+                </div>
+
+                <div class="bg-slate-900 border border-slate-800 rounded-xl p-3 flex items-center gap-3">
+                    <div class="w-10 h-10 rounded-lg bg-indigo-500/10 border border-indigo-500/20 text-indigo-400 flex items-center justify-center font-bold text-lg">
+                        <i class="fa-solid fa-bars-progress"></i>
+                    </div>
+                    <div class="w-full">
+                        <div class="text-xs text-slate-400 font-medium flex justify-between">
+                            <span>Progreso</span>
+                            <span id="stat-progress-text">0 / 0</span>
+                        </div>
+                        <div class="w-full bg-slate-950 h-2 rounded-full mt-1.5 overflow-hidden border border-slate-800">
+                            <div id="stat-progress-bar" class="bg-gradient-to-r from-sky-500 to-indigo-500 h-full w-0 transition-all duration-300"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- FLASHCARD CENTER STAGE -->
+            <div id="card-wrapper" class="max-w-2xl mx-auto">
+                <div id="quiz-card" class="bg-slate-900 border border-slate-800 rounded-3xl p-6 shadow-2xl relative overflow-hidden flex flex-col items-center">
+                    
+                    <!-- Year Badge (Always Visible & Highlighted) -->
+                    <div class="mb-4 text-center">
+                        <span class="text-xs uppercase tracking-widest text-slate-400 font-semibold block mb-1">Período Presidencial</span>
+                        <div id="card-years" class="inline-block text-2xl md:text-3xl font-extrabold tracking-tight px-6 py-1.5 rounded-2xl bg-gradient-to-r from-sky-500/20 via-sky-400/10 to-amber-500/20 text-sky-300 border border-sky-500/30 glow-celeste">
+                            1868 - 1874
+                        </div>
+                    </div>
+
+                    <!-- Party / Era Badge (Optional) -->
+                    <div id="card-party-container" class="mb-5">
+                        <span id="card-party" class="text-xs font-bold px-3 py-1 rounded-full bg-slate-800 text-amber-300 border border-amber-500/30 uppercase tracking-wide">
+                            PARTIDO AUTONOMISTA NACIONAL
+                        </span>
+                    </div>
+
+                    <!-- Portrait Image Container -->
+                    <div class="relative w-56 h-72 md:w-64 md:h-80 rounded-2xl overflow-hidden bg-slate-950 border-2 border-slate-800 shadow-inner flex items-center justify-center group mb-6">
+                        <!-- Spinner while image loads -->
+                        <div id="portrait-spinner" class="absolute inset-0 flex items-center justify-center bg-slate-950 z-10">
+                            <i class="fa-solid fa-circle-notch fa-spin text-sky-400 text-3xl"></i>
+                        </div>
+
+                        <!-- Image -->
+                        <img id="card-image" src="" alt="Retrato Histórico" referrerpolicy="no-referrer" crossorigin="anonymous" class="w-full h-full object-cover object-top transition-all duration-300 group-hover:scale-105" onload="handleImageLoad()" onerror="handleImageError()">
+
+                        <!-- Historical Styled Fallback Avatar (Rich Graphic Portrait) -->
+                        <div id="card-fallback-avatar" class="hidden absolute inset-0 bg-gradient-to-b from-slate-800 via-slate-900 to-slate-950 flex flex-col items-center justify-between p-5 text-center border-4 border-double border-amber-500/30">
+                            <div class="w-full flex justify-between items-center text-[10px] uppercase tracking-widest text-amber-400/70 font-serif">
+                                <span>República Argentina</span>
+                                <i class="fa-solid fa-landmark"></i>
+                            </div>
+                            <div class="my-auto flex flex-col items-center">
+                                <div class="w-24 h-24 rounded-full bg-slate-800/80 border-2 border-amber-400/40 flex items-center justify-center mb-3 shadow-lg">
+                                    <i id="fallback-icon" class="fa-solid fa-user-tie text-5xl text-amber-200/80"></i>
+                                </div>
+                                <span id="fallback-initials" class="text-2xl font-black text-amber-300 tracking-widest font-serif">D.F.S.</span>
+                            </div>
+                            <div class="w-full border-t border-slate-800 pt-2">
+                                <span id="fallback-era-tag" class="text-[11px] font-medium text-slate-400 block truncate">Retrato Oficial</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- HINT DISPLAY AREA -->
+                    <div id="hint-box" class="hidden w-full bg-amber-500/10 border border-amber-500/30 rounded-xl p-3 mb-4 text-center text-xs text-amber-200">
+                        <i class="fa-solid fa-lightbulb text-amber-400 mr-1.5"></i>
+                        <span id="hint-text">Pista...</span>
+                    </div>
+
+                    <!-- FEEDBACK BANNER (Correct / Incorrect) -->
+                    <div id="feedback-box" class="hidden w-full rounded-2xl p-4 mb-4 text-center pop-in">
+                        <div id="feedback-icon" class="text-3xl mb-1"></div>
+                        <div id="feedback-title" class="text-lg font-bold"></div>
+                        <div id="feedback-detail" class="text-sm mt-1 text-slate-300"></div>
+                    </div>
+
+                    <!-- INPUT FORM -->
+                    <form id="quiz-form" onsubmit="submitAnswer(event)" class="w-full space-y-3">
+                        <div class="relative">
+                            <input type="text" id="user-input" autocomplete="off" placeholder="Escribí el nombre o apellido del presidente..." class="w-full bg-slate-950 border-2 border-slate-700 focus:border-sky-500 text-white rounded-2xl px-5 py-3.5 pr-12 text-base md:text-lg focus:outline-none focus:ring-4 focus:ring-sky-500/20 transition placeholder-slate-500">
+                            <button type="button" onclick="clearInput()" class="absolute right-4 top-1/2 -translate-y-1/2 text-slate-500 hover:text-slate-300 p-1">
+                                <i class="fa-solid fa-xmark"></i>
+                            </button>
+                        </div>
+
+                        <!-- BUTTONS ROW -->
+                        <div class="grid grid-cols-2 sm:grid-cols-3 gap-2 pt-1">
+                            <button type="button" id="hint-btn" onclick="showHint()" class="px-4 py-3 bg-slate-800 hover:bg-slate-700 text-amber-300 font-semibold rounded-xl text-sm transition flex items-center justify-center gap-2 border border-slate-700">
+                                <i class="fa-solid fa-lightbulb"></i> Pista
+                            </button>
+                            <button type="button" id="skip-btn" onclick="skipCard()" class="px-4 py-3 bg-slate-800 hover:bg-slate-700 text-slate-300 font-semibold rounded-xl text-sm transition flex items-center justify-center gap-2 border border-slate-700">
+                                <i class="fa-solid fa-forward"></i> Revelar
+                            </button>
+                            <button type="submit" id="submit-btn" class="col-span-2 sm:col-span-1 px-4 py-3 bg-gradient-to-r from-sky-500 to-sky-600 hover:from-sky-400 hover:to-sky-500 text-white font-bold rounded-xl text-sm shadow-lg shadow-sky-500/25 transition flex items-center justify-center gap-2">
+                                Comprobar <i class="fa-solid fa-check"></i>
+                            </button>
+                        </div>
+                    </form>
+
+                    <!-- NEXT CARD BUTTON (Revealed after answer) -->
+                    <button id="next-btn" onclick="nextCard()" class="hidden w-full mt-3 px-6 py-4 bg-emerald-600 hover:bg-emerald-500 text-white font-bold rounded-2xl text-base shadow-lg shadow-emerald-600/30 transition flex items-center justify-center gap-2 pop-in">
+                        Siguiente Presidente <i class="fa-solid fa-arrow-right"></i>
+                    </button>
+                </div>
+            </div>
+
+            <!-- COMPLETED ALL / ERROR REVIEW PROMPT (Hidden initially) -->
+            <div id="finish-screen" class="hidden max-w-lg mx-auto bg-slate-900 border border-slate-800 rounded-3xl p-8 text-center space-y-6">
+                <div class="w-20 h-20 mx-auto rounded-full bg-sky-500/20 text-sky-400 flex items-center justify-center text-4xl border border-sky-500/40">
+                    🏆
+                </div>
+                <div>
+                    <h2 class="text-2xl font-extrabold text-white">¡Ronda Finalizada!</h2>
+                    <p class="text-slate-400 text-sm mt-1">Has completado la lista de presidentes seleccionada.</p>
+                </div>
+
+                <div class="bg-slate-950 p-4 rounded-2xl grid grid-cols-2 gap-4 border border-slate-800">
+                    <div>
+                        <div class="text-xs text-slate-500 uppercase">Aciertos Total</div>
+                        <div id="final-correct" class="text-2xl font-black text-emerald-400">0</div>
+                    </div>
+                    <div>
+                        <div class="text-xs text-slate-500 uppercase">Errores</div>
+                        <div id="final-incorrect" class="text-2xl font-black text-rose-400">0</div>
+                    </div>
+                </div>
+
+                <div class="flex flex-col sm:flex-row gap-3">
+                    <button id="review-errors-btn" onclick="startErrorReview()" class="hidden flex-1 px-4 py-3 bg-rose-600 hover:bg-rose-500 text-white font-bold rounded-xl text-sm transition flex items-center justify-center gap-2">
+                        <i class="fa-solid fa-rotate-right"></i> Repasar Errores
+                    </button>
+                    <button onclick="restartQuiz()" class="flex-1 px-4 py-3 bg-sky-600 hover:bg-sky-500 text-white font-bold rounded-xl text-sm transition flex items-center justify-center gap-2">
+                        <i class="fa-solid fa-arrows-rotate"></i> Reiniciar Todo
+                    </button>
+                </div>
+            </div>
+
+        </div>
+
+        <!-- ================= VIEW 2: FULL TIMELINE GUIDE ================= -->
+        <div id="view-guide" class="hidden space-y-6">
+
+            <div class="flex flex-wrap items-center justify-between gap-4 bg-slate-900 border border-slate-800 p-4 rounded-2xl">
+                <div>
+                    <h2 class="text-xl font-bold text-white flex items-center gap-2">
+                        <i class="fa-solid fa-book text-sky-400"></i> Guía Cronológica de Presidentes
+                    </h2>
+                    <p class="text-xs text-slate-400">Línea de tiempo oficial desde 1854 hasta 2023</p>
+                </div>
+
+                <!-- Search inside guide -->
+                <div class="relative w-full sm:w-72">
+                    <input type="text" id="guide-search" oninput="filterGuide()" placeholder="Buscar presidente o año..." class="w-full bg-slate-950 border border-slate-700 text-white text-sm rounded-xl px-4 py-2 pl-10 focus:outline-none focus:border-sky-500">
+                    <i class="fa-solid fa-magnifying-glass absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-500 text-xs"></i>
+                </div>
+            </div>
+
+            <!-- Grid of All Cards -->
+            <div id="guide-grid" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+                <!-- Injected via JS -->
+            </div>
+
+        </div>
+
+    </main>
+
+    <!-- FOOTER -->
+    <footer class="border-t border-slate-800 bg-slate-900/60 py-4 text-center text-xs text-slate-500 mt-8">
+        <p>Aplicación Educativa de Historia Argentina • Períodos Presidenciales 1854 - 2023</p>
+    </footer>
+
+    <!-- JAVASCRIPT LOGIC -->
+    <script>
+        /* ==========================================================================
+           1. COMPLETE DATABASE (48 Presidential Mandates - 1854 to 2023)
+           ========================================================================== */
+        const PRESIDENTES = [
+            // ORGANIZACIÓN NACIONAL (1854 - 1874)
+            {
+                id: 1,
+                name: "Justo José de Urquiza",
+                period: "1854 - 1860",
+                era: "Confederación Argentina",
+                eraGroup: "ORG_PAN",
+                isMilitary: true,
+                img: "https://commons.wikimedia.org/wiki/Special:FilePath/Justo_Jos%C3%A9_de_Urquiza_(1860).jpg?width=400",
+                aliases: ["urquiza", "justo jose de urquiza", "justo urquiza", "general urquiza"],
+                hint: "Primer presidente constitucional bajo la Constitución de 1853, vencedor en Caseros."
+            },
+            {
+                id: 2,
+                name: "Santiago Derqui",
+                period: "1860 - 1861",
+                era: "Confederación Argentina",
+                eraGroup: "ORG_PAN",
+                img: "https://commons.wikimedia.org/wiki/Special:FilePath/Santiago_Derqui_(retrato).jpg?width=400",
+                aliases: ["derqui", "santiago derqui"],
+                hint: "Renunció tras la Batalla de Pavón en 1861."
+            },
+            {
+                id: 3,
+                name: "Bartolomé Mitre",
+                period: "1862 - 1868",
+                era: "Partido Liberal",
+                eraGroup: "ORG_PAN",
+                img: "https://commons.wikimedia.org/wiki/Special:FilePath/Bartolome_Mitre_(fotograf%C3%ADa).jpg?width=400",
+                aliases: ["mitre", "bartolome mitre", "bartolo mitre"],
+                hint: "Primer presidente de la República Argentina unificada y fundador de La Nación."
+            },
+            {
+                id: 4,
+                name: "Domingo Faustino Sarmiento",
+                period: "1868 - 1874",
+                era: "Independiente / Liberal",
+                eraGroup: "ORG_PAN",
+                img: "https://commons.wikimedia.org/wiki/Special:FilePath/Domingo_Faustino_Sarmiento_by_Bradley_1873.jpg?width=400",
+                aliases: ["sarmiento", "domingo faustino sarmiento", "domingo sarmiento", "dfs"],
+                hint: "El 'Padre del Aula', impulsó fuertemente la educación pública y los primeros censos."
+            },
+
+            // PARTIDO AUTONOMISTA NACIONAL (PAN) (1874 - 1916)
+            {
+                id: 5,
+                name: "Nicolás Avellaneda",
+                period: "1874 - 1880",
+                era: "Partido Autonomista Nacional",
+                eraGroup: "ORG_PAN",
+                img: "https://commons.wikimedia.org/wiki/Special:FilePath/Nicolas_Avellaneda.jpg?width=400",
+                aliases: ["avellaneda", "nicolas avellaneda"],
+                hint: "Presidente más joven en asumir (36 años) y logró la Federalización de Buenos Aires."
+            },
+            {
+                id: 6,
+                name: "Julio Argentino Roca",
+                period: "1880 - 1886",
+                era: "Partido Autonomista Nacional",
+                eraGroup: "ORG_PAN",
+                isMilitary: true,
+                img: "https://commons.wikimedia.org/wiki/Special:FilePath/Julio_Argentino_Roca_(retrato).jpg?width=400",
+                aliases: ["roca", "julio argentino roca", "julio roca", "el zorro"],
+                hint: "Líder de la Generación del 80 bajo el lema 'Paz y Administración' (1º Mandato)."
+            },
+            {
+                id: 7,
+                name: "Miguel Juárez Celman",
+                period: "1886 - 1890",
+                era: "Partido Autonomista Nacional",
+                eraGroup: "ORG_PAN",
+                img: "https://commons.wikimedia.org/wiki/Special:FilePath/Miguel_Juarez_Celman.jpg?width=400",
+                aliases: ["juarez celman", "miguel juarez celman", "celman"],
+                hint: "Lideró el Unicato y renunció tras la Revolución del Parque de 1890."
+            },
+            {
+                id: 8,
+                name: "Carlos Pellegrini",
+                period: "1890 - 1892",
+                era: "Partido Autonomista Nacional",
+                eraGroup: "ORG_PAN",
+                img: "https://commons.wikimedia.org/wiki/Special:FilePath/Carlos_Pellegrini_portrait.jpg?width=400",
+                aliases: ["pellegrini", "carlos pellegrini"],
+                hint: "Apodado 'El Piloto de Tormentas', fundó el Banco de la Nación Argentina."
+            },
+            {
+                id: 9,
+                name: "Luis Sáenz Peña",
+                period: "1892 - 1895",
+                era: "Partido Autonomista Nacional",
+                eraGroup: "ORG_PAN",
+                img: "https://commons.wikimedia.org/wiki/Special:FilePath/Luis_S%C3%A1enz_Pe%C3%B1a.jpg?width=400",
+                aliases: ["luis saenz peña", "saenz peña", "luis saenz pena"],
+                hint: "Padre de Roque Sáenz Peña; dimitió por falta de apoyo político en 1895."
+            },
+            {
+                id: 10,
+                name: "José Evaristo Uriburu",
+                period: "1895 - 1898",
+                era: "Partido Autonomista Nacional",
+                eraGroup: "ORG_PAN",
+                img: "https://commons.wikimedia.org/wiki/Special:FilePath/Jose_Evaristo_Uriburu_1895.jpg?width=400",
+                aliases: ["jose evaristo uriburu", "uriburu", "evaristo uriburu"],
+                hint: "Completó el mandato de Luis Sáenz Peña y reorganizó la Lotería Nacional."
+            },
+            {
+                id: 11,
+                name: "Julio Argentino Roca",
+                period: "1898 - 1904",
+                era: "Partido Autonomista Nacional",
+                eraGroup: "ORG_PAN",
+                isMilitary: true,
+                img: "https://commons.wikimedia.org/wiki/Special:FilePath/Julio_Argentino_Roca_(retrato).jpg?width=400",
+                aliases: ["roca", "julio argentino roca", "julio roca"],
+                hint: "Segundo mandato constitucional de Roca; promulgó la Ley Riccheri de servicio militar."
+            },
+            {
+                id: 12,
+                name: "Manuel Quintana",
+                period: "1904 - 1906",
+                era: "Partido Autonomista Nacional",
+                eraGroup: "ORG_PAN",
+                img: "https://commons.wikimedia.org/wiki/Special:FilePath/Manuel_Quintana.jpg?width=400",
+                aliases: ["quintana", "manuel quintana"],
+                hint: "Enfrentó la revolución radical de 1905 y falleció en ejercicio del cargo."
+            },
+            {
+                id: 13,
+                name: "José Figueroa Alcorta",
+                period: "1906 - 1910",
+                era: "Partido Autonomista Nacional",
+                eraGroup: "ORG_PAN",
+                img: "https://commons.wikimedia.org/wiki/Special:FilePath/Jose_Figueroa_Alcorta.jpg?width=400",
+                aliases: ["figueroa alcorta", "jose figueroa alcorta"],
+                hint: "Presidió los festejos del Centenario de la Revolución de Mayo en 1910."
+            },
+            {
+                id: 14,
+                name: "Roque Sáenz Peña",
+                period: "1910 - 1914",
+                era: "Partido Autonomista Nacional",
+                eraGroup: "ORG_PAN",
+                img: "https://commons.wikimedia.org/wiki/Special:FilePath/Roque_S%C3%A1enz_Pe%C3%B1a_(retrato).jpg?width=400",
+                aliases: ["roque saenz peña", "saenz peña", "roque saenz pena"],
+                hint: "Impulsó la histórica Ley 8871 de voto secreto, universal y obligatorio."
+            },
+            {
+                id: 15,
+                name: "Victorino de la Plaza",
+                period: "1914 - 1916",
+                era: "Partido Autonomista Nacional",
+                eraGroup: "ORG_PAN",
+                img: "https://commons.wikimedia.org/wiki/Special:FilePath/Victorino_de_la_Plaza_c1914.jpg?width=400",
+                aliases: ["victorino de la plaza", "de la plaza"],
+                hint: "Último presidente del período conservador antes del triunfo de la UCR."
+            },
+
+            // PRIMEROS GOBIERNOS RADICALES & DÉCADA INFAME (1916 - 1946)
+            {
+                id: 16,
+                name: "Hipólito Yrigoyen",
+                period: "1916 - 1922",
+                era: "UCR",
+                eraGroup: "UCR_INFAME",
+                img: "https://commons.wikimedia.org/wiki/Special:FilePath/Hip%C3%B3lito_Yrigoyen_con_banda_presidencial.jpg?width=400",
+                aliases: ["yrigoyen", "irigoyen", "hipolito yrigoyen", "hipolito irigoyen", "el peludo"],
+                hint: "Primer presidente electo por voto universal secreto (1º Mandato)."
+            },
+            {
+                id: 17,
+                name: "Marcelo Torcuato de Alvear",
+                period: "1922 - 1928",
+                era: "UCR",
+                eraGroup: "UCR_INFAME",
+                img: "https://commons.wikimedia.org/wiki/Special:FilePath/Marcelo_T._de_Alvear_banda_presidencial.jpg?width=400",
+                aliases: ["alvear", "marcelo t de alvear", "marcelo de alvear", "marcelo torcuato de alvear"],
+                hint: "Período de bonanza económica y creación de YPF bajo la UCR antipersonalista."
+            },
+            {
+                id: 18,
+                name: "Hipólito Yrigoyen",
+                period: "1928 - 1930",
+                era: "UCR",
+                eraGroup: "UCR_INFAME",
+                img: "https://commons.wikimedia.org/wiki/Special:FilePath/Hip%C3%B3lito_Yrigoyen_con_banda_presidencial.jpg?width=400",
+                aliases: ["yrigoyen", "irigoyen", "hipolito yrigoyen", "hipolito irigoyen"],
+                hint: "Segundo mandato interrumpido por el primer golpe de Estado militar argentino."
+            },
+            {
+                id: 19,
+                name: "José Félix Uriburu",
+                period: "1930 - 1932",
+                era: "Década Infame (De facto)",
+                eraGroup: "UCR_INFAME",
+                isMilitary: true,
+                img: "https://commons.wikimedia.org/wiki/Special:FilePath/Jose_Felix_Uriburu.jpg?width=400",
+                aliases: ["uriburu", "jose felix uriburu", "felix uriburu"],
+                hint: "Encabezó el primer golpe de Estado cívico-militar en la historia argentina."
+            },
+            {
+                id: 20,
+                name: "Agustín Pedro Justo",
+                period: "1932 - 1938",
+                era: "Década Infame (Concordancia)",
+                eraGroup: "UCR_INFAME",
+                isMilitary: true,
+                img: "https://commons.wikimedia.org/wiki/Special:FilePath/Agust%C3%ADn_Pedro_Justo.jpg?width=400",
+                aliases: ["justo", "agustin pedro justo", "agustin justo"],
+                hint: "Firmó el polémico Pacto Roca-Runciman durante la Concordancia."
+            },
+            {
+                id: 21,
+                name: "Roberto Marcelino Ortiz",
+                period: "1938 - 1942",
+                era: "Década Infame (Concordancia)",
+                eraGroup: "UCR_INFAME",
+                img: "https://commons.wikimedia.org/wiki/Special:FilePath/Roberto_Marcelino_Ortiz.jpg?width=400",
+                aliases: ["ortiz", "roberto marcelino ortiz", "roberto ortiz"],
+                hint: "Intentó sanear el fraude electoral pero debió renunciar por diabetes."
+            },
+            {
+                id: 22,
+                name: "Ramón Castillo",
+                period: "1942 - 1943",
+                era: "Década Infame (Concordancia)",
+                eraGroup: "UCR_INFAME",
+                img: "https://commons.wikimedia.org/wiki/Special:FilePath/Ramon_S_Castillo.jpg?width=400",
+                aliases: ["castillo", "ramon castillo", "ramon s castillo"],
+                hint: "Último mandatario de la Década Infame, derrocado por la Revolución del 43."
+            },
+            {
+                id: 23,
+                name: "Arturo Rawson",
+                period: "1943 - 1943",
+                era: "GOU (De facto)",
+                eraGroup: "UCR_INFAME",
+                isMilitary: true,
+                img: "https://commons.wikimedia.org/wiki/Special:FilePath/Arturo_Rawson.jpg?width=400",
+                aliases: ["rawson", "arturo rawson"],
+                hint: "Gobernó solo 3 días en junio de 1943 tras liderar el golpe."
+            },
+            {
+                id: 24,
+                name: "Pedro Pablo Ramírez",
+                period: "1943 - 1944",
+                era: "GOU (De facto)",
+                eraGroup: "UCR_INFAME",
+                isMilitary: true,
+                img: "https://commons.wikimedia.org/wiki/Special:FilePath/Pedro_Pablo_Ramirez.jpg?width=400",
+                aliases: ["ramirez", "pedro pablo ramirez", "pedro ramirez"],
+                hint: "Ruptura de relaciones diplomáticas con el Eje durante la WWII."
+            },
+            {
+                id: 25,
+                name: "Edelmiro Julián Farrell",
+                period: "1944 - 1946",
+                era: "GOU (De facto)",
+                eraGroup: "UCR_INFAME",
+                isMilitary: true,
+                img: "https://commons.wikimedia.org/wiki/Special:FilePath/Edelmiro_Farrell.jpg?width=400",
+                aliases: ["farrell", "edelmiro farrell", "edelmiro julian farrell"],
+                hint: "Designó a Juan Domingo Perón como vicepresidente y ministro de Guerra."
+            },
+
+            // PERONISMO, GOLPES Y TRANSICIÓN (1946 - 1983)
+            {
+                id: 26,
+                name: "Juan Domingo Perón",
+                period: "1946 - 1955",
+                era: "Peronismo",
+                eraGroup: "PERON_GOLPES",
+                isMilitary: true,
+                img: "https://commons.wikimedia.org/wiki/Special:FilePath/Juan_Domingo_Per%C3%B3n_1946.jpg?width=400",
+                aliases: ["peron", "juan domingo peron", "juan peron"],
+                hint: "Primeros dos mandatos constitucionales del Justicialismo y voto femenino."
+            },
+            {
+                id: 27,
+                name: "Eduardo Lonardi",
+                period: "1955 - 1955",
+                era: "Revolución Libertadora",
+                eraGroup: "PERON_GOLPES",
+                isMilitary: true,
+                img: "https://commons.wikimedia.org/wiki/Special:FilePath/Eduardo_Lonardi.jpg?width=400",
+                aliases: ["lonardi", "eduardo lonardi"],
+                hint: "Lideró el golpe contra Perón bajo la frase 'ni vencedores ni vencidos'."
+            },
+            {
+                id: 28,
+                name: "Pedro Eugenio Aramburu",
+                period: "1955 - 1958",
+                era: "Revolución Libertadora",
+                eraGroup: "PERON_GOLPES",
+                isMilitary: true,
+                img: "https://commons.wikimedia.org/wiki/Special:FilePath/Pedro_Eugenio_Aramburu_banda_presidencial.jpg?width=400",
+                aliases: ["aramburu", "pedro eugenio aramburu", "pedro aramburu"],
+                hint: "Proscribió al peronismo y derogó la Constitución de 1949."
+            },
+            {
+                id: 29,
+                name: "Arturo Frondizi",
+                period: "1958 - 1962",
+                era: "Desarrollismo (UCRI)",
+                eraGroup: "PERON_GOLPES",
+                img: "https://commons.wikimedia.org/wiki/Special:FilePath/Arturo_Frondizi_1958.jpg?width=400",
+                aliases: ["frondizi", "arturo frondizi"],
+                hint: "Impulsó el desarrollo industrial, petrolero y la educación universitaria privada."
+            },
+            {
+                id: 30,
+                name: "Arturo Umberto Illia",
+                period: "1963 - 1966",
+                era: "UCR",
+                eraGroup: "PERON_GOLPES",
+                img: "https://commons.wikimedia.org/wiki/Special:FilePath/Arturo_Umberto_Illia_1963.jpg?width=400",
+                aliases: ["illia", "arturo illia", "arturo umberto illia"],
+                hint: "Reconocido por su honestidad, la ley de medicamentos y la anulación de contratos petroleros."
+            },
+            {
+                id: 31,
+                name: "Juan Carlos Onganía",
+                period: "1966 - 1970",
+                era: "Revolución Argentina",
+                eraGroup: "PERON_GOLPES",
+                isMilitary: true,
+                img: "https://commons.wikimedia.org/wiki/Special:FilePath/Juan_Carlos_Ongan%C3%ADa.jpg?width=400",
+                aliases: ["ongania", "juan carlos ongania"],
+                hint: "Asumió tras el golpe a Illia; ocurrió la Noche de los Bastones Largos y el Cordobazo."
+            },
+            {
+                id: 32,
+                name: "Roberto Marcelo Levingston",
+                period: "1970 - 1971",
+                era: "Revolución Argentina",
+                eraGroup: "PERON_GOLPES",
+                isMilitary: true,
+                img: "https://commons.wikimedia.org/wiki/Special:FilePath/Roberto_Marcelo_Levingston.jpg?width=400",
+                aliases: ["levingston", "roberto marcelo levingston", "roberto levingston"],
+                hint: "Designado por la Junta Militar tras la destitución de Onganía."
+            },
+            {
+                id: 33,
+                name: "Alejandro Agustín Lanusse",
+                period: "1971 - 1973",
+                era: "Revolución Argentina",
+                eraGroup: "PERON_GOLPES",
+                isMilitary: true,
+                img: "https://commons.wikimedia.org/wiki/Special:FilePath/Alejandro_Agust%C3%ADn_Lanusse.jpg?width=400",
+                aliases: ["lanusse", "alejandro agustin lanusse", "alejandro lanusse"],
+                hint: "Convocó al Gran Acuerdo Nacional y a elecciones libres en 1973."
+            },
+            {
+                id: 34,
+                name: "Héctor José Cámpora",
+                period: "1973 - 1973",
+                era: "Peronismo",
+                eraGroup: "PERON_GOLPES",
+                img: "https://commons.wikimedia.org/wiki/Special:FilePath/H%C3%A9ctor_Jos%C3%A9_C%C3%A1mpora_1973.jpg?width=400",
+                aliases: ["campora", "hector jose campora", "hector campora", "el tio"],
+                hint: "Gobernó 49 días bajo el lema 'Cámpora al Gobierno, Perón al Poder'."
+            },
+            {
+                id: 35,
+                name: "Juan Domingo Perón",
+                period: "1973 - 1974",
+                era: "Peronismo",
+                eraGroup: "PERON_GOLPES",
+                img: "https://commons.wikimedia.org/wiki/Special:FilePath/Juan_Domingo_Per%C3%B3n_1946.jpg?width=400",
+                aliases: ["peron", "juan domingo peron", "juan peron"],
+                hint: "Tercer mandato presidencial tras regresar del exilio; falleció en el cargo en 1974."
+            },
+            {
+                id: 36,
+                name: "María Estela Martínez de Perón",
+                period: "1974 - 1976",
+                era: "Peronismo",
+                eraGroup: "PERON_GOLPES",
+                isFemale: true,
+                img: "https://commons.wikimedia.org/wiki/Special:FilePath/Isabel_Per%C3%B3n_1974.jpg?width=400",
+                aliases: ["isabel peron", "isabelita", "maria estela martinez de peron", "martinez de peron", "isabel martinez de peron"],
+                hint: "Primera mujer presidenta de las Américas; derrocada por el golpe de 1976."
+            },
+            {
+                id: 37,
+                name: "Jorge Rafael Videla",
+                period: "1976 - 1981",
+                era: "Proceso de Reorganización Nacional",
+                eraGroup: "PERON_GOLPES",
+                isMilitary: true,
+                img: "https://commons.wikimedia.org/wiki/Special:FilePath/Jorge_Rafael_Videla_1976.jpg?width=400",
+                aliases: ["videla", "jorge rafael videla", "jorge videla"],
+                hint: "Encabezó la primera junta militar de la dictadura iniciada en 1976."
+            },
+            {
+                id: 38,
+                name: "Roberto Eduardo Viola",
+                period: "1981 - 1981",
+                era: "Proceso de Reorganización Nacional",
+                eraGroup: "PERON_GOLPES",
+                isMilitary: true,
+                img: "https://commons.wikimedia.org/wiki/Special:FilePath/Roberto_Eduardo_Viola.jpg?width=400",
+                aliases: ["viola", "roberto eduardo viola", "roberto viola"],
+                hint: "Sustituyó a Videla durante 8 meses en 1981 antes de ser desplazado."
+            },
+            {
+                id: 39,
+                name: "Leopoldo Fortunato Galtieri",
+                period: "1981 - 1982",
+                era: "Proceso de Reorganización Nacional",
+                eraGroup: "PERON_GOLPES",
+                isMilitary: true,
+                img: "https://commons.wikimedia.org/wiki/Special:FilePath/Leopoldo_Fortunato_Galtieri.jpg?width=400",
+                aliases: ["galtieri", "leopoldo fortunato galtieri", "leopoldo galtieri"],
+                hint: "Presidente de facto durante el conflicto armado de la Guerra de Malvinas."
+            },
+            {
+                id: 40,
+                name: "Reynaldo Bignone",
+                period: "1982 - 1983",
+                era: "Proceso de Reorganización Nacional",
+                eraGroup: "PERON_GOLPES",
+                isMilitary: true,
+                img: "https://commons.wikimedia.org/wiki/Special:FilePath/Reynaldo_Bignone.jpg?width=400",
+                aliases: ["bignone", "reynaldo bignone", "reynaldo benito bignone"],
+                hint: "Último de facto; entregó el poder a Raúl Alfonsín el 10 de diciembre de 1983."
+            },
+
+            // DEMOCRACIA RESTAURADA (1983 - 2023)
+            {
+                id: 41,
+                name: "Raúl Alfonsín",
+                period: "1983 - 1989",
+                era: "UCR",
+                eraGroup: "DEMOCRACIA",
+                img: "https://commons.wikimedia.org/wiki/Special:FilePath/Ra%C3%BAl_Alfons%C3%ADn_1983.jpg?width=400",
+                aliases: ["alfonsin", "raul alfonsin", "padre de la democracia"],
+                hint: "El 'Padre de la Democracia moderna'; impulsó el Juicio a las Juntas Militar."
+            },
+            {
+                id: 42,
+                name: "Carlos Saúl Menem",
+                period: "1989 - 1999",
+                era: "Peronismo",
+                eraGroup: "DEMOCRACIA",
+                img: "https://commons.wikimedia.org/wiki/Special:FilePath/Carlos_Menem_fotograf%C3%ADa_oficial.jpg?width=400",
+                aliases: ["menem", "carlos menem", "carlos saul menem"],
+                hint: "Gobernó 10 años continuos marcado por la Convertibilidad 1 a 1 y privatizaciones."
+            },
+            {
+                id: 43,
+                name: "Fernando de la Rúa",
+                period: "1999 - 2001",
+                era: "UCR / La Alianza",
+                eraGroup: "DEMOCRACIA",
+                img: "https://commons.wikimedia.org/wiki/Special:FilePath/Fernando_de_la_R%C3%BAa_1999.jpg?width=400",
+                aliases: ["de la rua", "la rua", "fernando de la rua"],
+                hint: "Renunció en helicóptero en diciembre de 2001 en medio del Corralito."
+            },
+            {
+                id: 44,
+                name: "Adolfo Rodríguez Saá",
+                period: "2001 - 2001",
+                era: "Peronismo",
+                eraGroup: "DEMOCRACIA",
+                img: "https://commons.wikimedia.org/wiki/Special:FilePath/Adolfo_Rodriguez_Saa.jpg?width=400",
+                aliases: ["rodriguez saa", "adolfo rodriguez saa", "saa"],
+                hint: "Gobernó durante 1 semana a finales de 2001 y declaró el default."
+            },
+            {
+                id: 45,
+                name: "Eduardo Duhalde",
+                period: "2002 - 2003",
+                era: "Peronismo",
+                eraGroup: "DEMOCRACIA",
+                img: "https://commons.wikimedia.org/wiki/Special:FilePath/Eduardo_Duhalde.jpg?width=400",
+                aliases: ["duhalde", "eduardo duhalde"],
+                hint: "Presidente interino designado por la Asamblea Legislativa que pesificó la economía."
+            },
+            {
+                id: 46,
+                name: "Néstor Kirchner",
+                period: "2003 - 2007",
+                era: "Peronismo",
+                eraGroup: "DEMOCRACIA",
+                img: "https://commons.wikimedia.org/wiki/Special:FilePath/N%C3%A9stor_Kirchner.jpg?width=400",
+                aliases: ["nestor kirchner", "kirchner"],
+                hint: "Gobernó tras desestimar el balotaje de 2003; desendeudamiento con el FMI."
+            },
+            {
+                id: 47,
+                name: "Cristina Fernández de Kirchner",
+                period: "2007 - 2015",
+                era: "Peronismo",
+                eraGroup: "DEMOCRACIA",
+                isFemale: true,
+                img: "https://commons.wikimedia.org/wiki/Special:FilePath/Cristina_Fernandez_de_Kirchner_official_photo.jpg?width=400",
+                aliases: ["cristina kirchner", "cfk", "cristina fernandez", "cristina fernandez de kirchner", "fernandez de kirchner"],
+                hint: "Primera mujer electa presidenta de Argentina; ejerció 2 mandatos consecutivos."
+            },
+            {
+                id: 48,
+                name: "Mauricio Macri",
+                period: "2015 - 2019",
+                era: "Cambiemos",
+                eraGroup: "DEMOCRACIA",
+                img: "https://commons.wikimedia.org/wiki/Special:FilePath/Mauricio_Macri_oficial.jpg?width=400",
+                aliases: ["macri", "mauricio macri"],
+                hint: "Primer presidente no peronista ni radical en completar su mandato desde 1928."
+            },
+            {
+                id: 49,
+                name: "Alberto Fernández",
+                period: "2019 - 2023",
+                era: "Peronismo",
+                eraGroup: "DEMOCRACIA",
+                img: "https://commons.wikimedia.org/wiki/Special:FilePath/Retrato_oficial_de_Alberto_Fern%C3%A1ndez.jpg?width=400",
+                aliases: ["alberto fernandez", "fernandez", "alberto"],
+                hint: "Presidió el país durante la pandemia del COVID-19."
+            }
+        ];
+
+        /* ==========================================================================
+           2. APP STATE VARIABLES
+           ========================================================================== */
+        let currentQueue = [];
+        let currentIndex = 0;
+        let stats = {
+            correct: 0,
+            incorrect: 0,
+            streak: 0,
+            errors: [] // Stores IDs of missed items
+        };
+        let currentOrder = "RANDOM"; // "RANDOM" | "CRONO"
+        let currentEraFilter = "ALL";
+        let isAnswered = false;
+
+        // Audio synth using Web Audio API
+        const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+
+        function playSound(type) {
+            const soundEnabled = document.getElementById('toggle-sound').checked;
+            if (!soundEnabled || !audioCtx) return;
+            
+            if (audioCtx.state === 'suspended') {
+                audioCtx.resume();
+            }
+
+            const osc = audioCtx.createOscillator();
+            const gain = audioCtx.createGain();
+            osc.connect(gain);
+            gain.connect(audioCtx.destination);
+
+            if (type === 'correct') {
+                osc.type = 'sine';
+                osc.frequency.setValueAtTime(523.25, audioCtx.currentTime); // C5
+                osc.frequency.exponentialRampToValueAtTime(659.25, audioCtx.currentTime + 0.15); // E5
+                gain.gain.setValueAtTime(0.15, audioCtx.currentTime);
+                gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.3);
+                osc.start();
+                osc.stop(audioCtx.currentTime + 0.3);
+            } else if (type === 'wrong') {
+                osc.type = 'triangle';
+                osc.frequency.setValueAtTime(180, audioCtx.currentTime);
+                osc.frequency.exponentialRampToValueAtTime(110, audioCtx.currentTime + 0.25);
+                gain.gain.setValueAtTime(0.2, audioCtx.currentTime);
+                gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.3);
+                osc.start();
+                osc.stop(audioCtx.currentTime + 0.3);
+            }
+        }
+
+        /* ==========================================================================
+           3. INITIALIZATION & VIEW SWITCHING
+           ========================================================================== */
+        window.onload = function() {
+            initQuiz();
+            renderGuide();
+        };
+
+        function switchView(viewName) {
+            const quizView = document.getElementById('view-quiz');
+            const guideView = document.getElementById('view-guide');
+            const navQuizBtn = document.getElementById('nav-quiz-btn');
+            const navGuideBtn = document.getElementById('nav-guide-btn');
+
+            if (viewName === 'quiz') {
+                quizView.classList.remove('hidden');
+                guideView.classList.add('hidden');
+                navQuizBtn.className = "px-4 py-1.5 rounded-lg font-medium transition flex items-center gap-2 bg-sky-600 text-white shadow-sm";
+                navGuideBtn.className = "px-4 py-1.5 rounded-lg font-medium transition flex items-center gap-2 text-slate-400 hover:text-white hover:bg-slate-900";
+            } else {
+                quizView.classList.add('hidden');
+                guideView.classList.remove('hidden');
+                navGuideBtn.className = "px-4 py-1.5 rounded-lg font-medium transition flex items-center gap-2 bg-sky-600 text-white shadow-sm";
+                navQuizBtn.className = "px-4 py-1.5 rounded-lg font-medium transition flex items-center gap-2 text-slate-400 hover:text-white hover:bg-slate-900";
+            }
+        }
+
+        /* ==========================================================================
+           4. QUIZ CORE LOGIC
+           ========================================================================== */
+        function shuffleArray(array) {
+            for (let i = array.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [array[i], array[j]] = [array[j], array[i]];
+            }
+            return array;
+        }
+
+        function initQuiz() {
+            stats.correct = 0;
+            stats.incorrect = 0;
+            stats.streak = 0;
+            stats.errors = [];
+            updateStatsUI();
+
+            document.getElementById('finish-screen').classList.add('hidden');
+            document.getElementById('card-wrapper').classList.remove('hidden');
+
+            applyFilters();
+        }
+
+        function applyFilters() {
+            const eraSelect = document.getElementById('filter-era');
+            currentEraFilter = eraSelect.value;
+
+            // Filter base array
+            let filtered = PRESIDENTES.filter(p => {
+                if (currentEraFilter === 'ALL') return true;
+                return p.eraGroup === currentEraFilter;
+            });
+
+            // Order array
+            if (currentOrder === 'RANDOM') {
+                currentQueue = shuffleArray([...filtered]);
+            } else {
+                currentQueue = [...filtered].sort((a, b) => a.id - b.id);
+            }
+
+            currentIndex = 0;
+            updateStatsUI();
+            renderCard();
+        }
+
+        function setOrder(orderType) {
+            currentOrder = orderType;
+            const randBtn = document.getElementById('order-rand-btn');
+            const cronoBtn = document.getElementById('order-crono-btn');
+
+            if (orderType === 'RANDOM') {
+                randBtn.className = "px-3 py-1.5 rounded-lg font-semibold bg-sky-600 text-white transition";
+                cronoBtn.className = "px-3 py-1.5 rounded-lg font-semibold text-slate-400 hover:text-white transition";
+            } else {
+                cronoBtn.className = "px-3 py-1.5 rounded-lg font-semibold bg-sky-600 text-white transition";
+                randBtn.className = "px-3 py-1.5 rounded-lg font-semibold text-slate-400 hover:text-white transition";
+            }
+
+            applyFilters();
+        }
+
+        function renderCard() {
+            if (currentQueue.length === 0 || currentIndex >= currentQueue.length) {
+                showFinishScreen();
+                return;
+            }
+
+            isAnswered = false;
+            const president = currentQueue[currentIndex];
+
+            // Reset UI components
+            document.getElementById('card-years').innerText = president.period;
+            
+            // Party badge toggle
+            const showParty = document.getElementById('toggle-party-badge').checked;
+            const partyContainer = document.getElementById('card-party-container');
+            const partyBadge = document.getElementById('card-party');
+            if (showParty) {
+                partyContainer.classList.remove('hidden');
+                partyBadge.innerText = president.era;
+            } else {
+                partyContainer.classList.add('hidden');
+            }
+
+            // Image handling
+            const imgEl = document.getElementById('card-image');
+            const spinner = document.getElementById('portrait-spinner');
+            const fallbackAvatar = document.getElementById('card-fallback-avatar');
+            const initialsEl = document.getElementById('fallback-initials');
+            const fallbackIcon = document.getElementById('fallback-icon');
+            const fallbackEraTag = document.getElementById('fallback-era-tag');
+
+            spinner.classList.remove('hidden');
+            fallbackAvatar.classList.add('hidden');
+            imgEl.classList.remove('hidden');
+
+            // Generate initials & icon for fallback
+            const nameParts = president.name.split(' ');
+            const initials = nameParts.map(n => n[0]).join('. ') + '.';
+            initialsEl.innerText = initials;
+            fallbackEraTag.innerText = president.period;
+
+            if (president.isMilitary) {
+                fallbackIcon.className = "fa-solid fa-medal text-5xl text-amber-200/80";
+            } else if (president.isFemale) {
+                fallbackIcon.className = "fa-solid fa-user text-5xl text-sky-300/80";
+            } else {
+                fallbackIcon.className = "fa-solid fa-user-tie text-5xl text-amber-200/80";
+            }
+
+            // Use wsrv.nl image proxy to bypass hotlink/CORS blocks on Wikimedia
+            const proxiedUrl = `https://wsrv.nl/?url=${encodeURIComponent(president.img)}&w=400&output=jpg`;
+            imgEl.src = proxiedUrl;
+            inputEl.classList.remove('border-emerald-500', 'border-rose-500');
+            inputEl.classList.add('border-slate-700');
+            inputEl.focus();
+
+            document.getElementById('quiz-form').classList.remove('hidden');
+            document.getElementById('next-btn').classList.add('hidden');
+
+            updateStatsUI();
+        }
+
+        function handleImageLoad() {
+            document.getElementById('portrait-spinner').classList.add('hidden');
+        }
+
+        function handleImageError() {
+            document.getElementById('portrait-spinner').classList.add('hidden');
+            document.getElementById('card-image').classList.add('hidden');
+            document.getElementById('card-fallback-avatar').classList.remove('hidden');
+        }
+
+        /* ==========================================================================
+           5. ANSWER VALIDATION & NORMALIZATION
+           ========================================================================== */
+        function normalizeText(text) {
+            return text
+                .toLowerCase()
+                .normalize("NFD")
+                .replace(/[\u0300-\u036f]/g, "") // remove accents
+                .replace(/[^a-z0-9\s]/g, "")     // remove special chars
+                .trim();
+        }
+
+        function submitAnswer(e) {
+            e.preventDefault();
+            if (isAnswered) return;
+
+            const inputEl = document.getElementById('user-input');
+            const userVal = normalizeText(inputEl.value);
+
+            if (!userVal) {
+                shakeCard();
+                return;
+            }
+
+            const current = currentQueue[currentIndex];
+            const isCorrect = checkMatch(userVal, current);
+
+            isAnswered = true;
+            inputEl.disabled = true;
+
+            const feedbackBox = document.getElementById('feedback-box');
+            const feedbackIcon = document.getElementById('feedback-icon');
+            const feedbackTitle = document.getElementById('feedback-title');
+            const feedbackDetail = document.getElementById('feedback-detail');
+
+            if (isCorrect) {
+                playSound('correct');
+                stats.correct++;
+                stats.streak++;
+
+                feedbackBox.className = "w-full rounded-2xl p-4 mb-4 text-center bg-emerald-500/15 border border-emerald-500/30 text-emerald-300 pop-in";
+                feedbackIcon.innerHTML = `<i class="fa-solid fa-circle-check text-emerald-400"></i>`;
+                feedbackTitle.innerText = "¡Excelente! Respuesta Correcta";
+                feedbackDetail.innerHTML = `<b class="text-white text-base">${current.name}</b> (${current.period})<br><span class="text-xs text-slate-300">${current.era}</span>`;
+            } else {
+                playSound('wrong');
+                stats.incorrect++;
+                stats.streak = 0;
+                if (!stats.errors.includes(current.id)) {
+                    stats.errors.push(current.id);
+                }
+
+                shakeCard();
+                feedbackBox.className = "w-full rounded-2xl p-4 mb-4 text-center bg-rose-500/15 border border-rose-500/30 text-rose-300 pop-in";
+                feedbackIcon.innerHTML = `<i class="fa-solid fa-circle-xmark text-rose-400"></i>`;
+                feedbackTitle.innerText = "Incorrecto";
+                feedbackDetail.innerHTML = `Respuesta correcta: <b class="text-white text-base">${current.name}</b> (${current.period})<br><span class="text-xs text-slate-300">${current.era}</span>`;
+            }
+
+            feedbackBox.classList.remove('hidden');
+            document.getElementById('quiz-form').classList.add('hidden');
+            document.getElementById('next-btn').classList.remove('hidden');
+            document.getElementById('next-btn').focus();
+
+            updateStatsUI();
+        }
+
+        function checkMatch(userVal, president) {
+            // Direct alias check
+            for (let alias of president.aliases) {
+                if (userVal === normalizeText(alias)) return true;
+            }
+            // Check if user entered surname alone
+            const nameWords = normalizeText(president.name).split(' ');
+            const lastWord = nameWords[nameWords.length - 1];
+            if (userVal === lastWord && lastWord.length > 3) return true;
+
+            return false;
+        }
+
+        function showHint() {
+            if (isAnswered) return;
+            const current = currentQueue[currentIndex];
+            const hintBox = document.getElementById('hint-box');
+            const hintText = document.getElementById('hint-text');
+
+            const nameParts = current.name.split(' ');
+            const initials = nameParts.map(n => n[0] + '.').join(' ');
+
+            hintText.innerHTML = `<b>Iniciales:</b> ${initials} &bull; <i>${current.hint}</i>`;
+            hintBox.classList.remove('hidden');
+        }
+
+        function skipCard() {
+            if (isAnswered) return;
+            const inputEl = document.getElementById('user-input');
+            inputEl.value = currentQueue[currentIndex].name;
+            submitAnswer(new Event('submit'));
+        }
+
+        function nextCard() {
+            currentIndex++;
+            renderCard();
+        }
+
+        function clearInput() {
+            const input = document.getElementById('user-input');
+            input.value = '';
+            input.focus();
+        }
+
+        function shakeCard() {
+            const card = document.getElementById('quiz-card');
+            card.classList.add('shake');
+            setTimeout(() => card.classList.remove('shake'), 400);
+        }
+
+        /* ==========================================================================
+           6. STATS & FINISH SCREEN
+           ========================================================================== */
+        function updateStatsUI() {
+            document.getElementById('stat-correct').innerText = stats.correct;
+            document.getElementById('stat-incorrect').innerText = stats.incorrect;
+            document.getElementById('stat-streak').innerText = `${stats.streak} 🔥`;
+
+            const totalInQueue = currentQueue.length;
+            const progressRatio = totalInQueue > 0 ? (currentIndex / totalInQueue) * 100 : 0;
+
+            document.getElementById('stat-progress-text').innerText = `${currentIndex} / ${totalInQueue}`;
+            document.getElementById('stat-progress-bar').style.width = `${progressRatio}%`;
+        }
+
+        function showFinishScreen() {
+            document.getElementById('card-wrapper').classList.add('hidden');
+            const finishScreen = document.getElementById('finish-screen');
+            finishScreen.classList.remove('hidden');
+
+            document.getElementById('final-correct').innerText = stats.correct;
+            document.getElementById('final-incorrect').innerText = stats.incorrect;
+
+            const reviewBtn = document.getElementById('review-errors-btn');
+            if (stats.errors.length > 0) {
+                reviewBtn.classList.remove('hidden');
+                reviewBtn.innerText = `Repasar Errores (${stats.errors.length})`;
+            } else {
+                reviewBtn.classList.add('hidden');
+            }
+        }
+
+        function startErrorReview() {
+            currentQueue = PRESIDENTES.filter(p => stats.errors.includes(p.id));
+            stats.errors = [];
+            currentIndex = 0;
+            document.getElementById('finish-screen').classList.add('hidden');
+            document.getElementById('card-wrapper').classList.remove('hidden');
+            renderCard();
+        }
+
+        function restartQuiz() {
+            initQuiz();
+        }
+
+        /* ==========================================================================
+           7. GUIDE VIEW (STUDY TABLE GRID)
+           ========================================================================== */
+        function renderGuide(items = PRESIDENTES) {
+            const grid = document.getElementById('guide-grid');
+            grid.innerHTML = '';
+
+            items.forEach(p => {
+                const card = document.createElement('div');
+                card.className = "bg-slate-900 border border-slate-800 rounded-2xl overflow-hidden shadow-lg flex flex-col hover:border-sky-500/50 transition group";
+                const proxiedImg = `https://wsrv.nl/?url=${encodeURIComponent(p.img)}&w=400&output=jpg`;
+
+                card.innerHTML = `
+                    <div class="h-48 bg-slate-950 relative overflow-hidden flex items-center justify-center">
+                        <img src="${proxiedImg}" alt="${p.name}" referrerpolicy="no-referrer" class="w-full h-full object-cover object-top group-hover:scale-105 transition duration-300" onerror="this.onerror=null; this.src='https://placehold.co/400x500/0f172a/74acdf?text=${encodeURIComponent(p.period)}'">
+                        <div class="absolute bottom-2 left-2 bg-slate-950/80 backdrop-blur px-2.5 py-1 rounded-lg text-xs font-bold text-sky-400 border border-slate-700">
+                            ${p.period}
+                        </div>
+                    </div>
+                    <div class="p-4 flex-1 flex flex-col justify-between space-y-2">
+                        <div>
+                            <span class="text-[10px] uppercase tracking-wider font-semibold text-amber-400 block">${p.era}</span>
+                            <h3 class="text-base font-bold text-white leading-snug mt-0.5">${p.name}</h3>
+                        </div>
+                        <p class="text-xs text-slate-400 leading-relaxed border-t border-slate-800/80 pt-2">
+                            ${p.hint}
+                        </p>
+                    </div>
+                `;
+                grid.appendChild(card);
+            });
+        }
+
+        function filterGuide() {
+            const query = normalizeText(document.getElementById('guide-search').value);
+            const filtered = PRESIDENTES.filter(p => {
+                return normalizeText(p.name).includes(query) || 
+                       normalizeText(p.period).includes(query) || 
+                       normalizeText(p.era).includes(query);
+            });
+            renderGuide(filtered);
+        }
+
+        /* Keyboard listener (Enter to advance if finished answering) */
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Enter') {
+                const nextBtn = document.getElementById('next-btn');
+                if (!nextBtn.classList.contains('hidden')) {
+                    e.preventDefault();
+                    nextCard();
+                }
+            }
+        });
+    </script>
+</body>
+</html>
